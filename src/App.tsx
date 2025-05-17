@@ -16,6 +16,7 @@ import SellPage from "@/pages/SellPage";
 import HistoryPage from "@/pages/HistoryPage";
 import AdminPage from "@/pages/AdminPage";
 import SettingsPage from "@/pages/SettingsPage";
+import WalletPage from "@/pages/WalletPage";
 import NotFound from "@/pages/NotFound";
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/buy" element={<BuyPage />} />
               <Route path="/sell" element={<SellPage />} />
+              <Route path="/wallet" element={<WalletPage />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>

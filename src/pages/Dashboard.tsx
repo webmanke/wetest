@@ -1,10 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageContainer from "@/components/PageContainer";
 import PageHeader from "@/components/PageHeader";
 import GlassCard from "@/components/GlassCard";
 import { useShares } from "@/hooks/useShares";
-import { Clock, TrendingUp, DollarSign, AlertCircle } from "lucide-react";
+import { Clock, TrendingUp, DollarSign, AlertCircle, ShoppingCart, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -21,12 +21,83 @@ const Dashboard = () => {
     availableShares
   } = useShares();
 
+  // Mock wallet balance - in a real app, this would come from Supabase
+  const walletBalance = 500;
+
+  // Calculate time remaining until next purchase
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+  
+  useEffect(() => {
+    if (!canPurchaseToday && nextPurchaseTime) {
+      const updateTimeRemaining = () => {
+        const now = new Date();
+        const targetTime = new Date(nextPurchaseTime);
+        
+        if (now >= targetTime) {
+          setTimeRemaining("Available now");
+          return;
+        }
+        
+        const diff = targetTime.getTime() - now.getTime();
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        setTimeRemaining(`${hours}h ${minutes}m remaining`);
+      };
+      
+      updateTimeRemaining();
+      const interval = setInterval(updateTimeRemaining, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [canPurchaseToday, nextPurchaseTime]);
+
   return (
     <PageContainer>
       <PageHeader 
         title="Dashboard" 
         subtitle="Your investment overview"
       />
+
+      {/* Wallet Card */}
+      <GlassCard className="mb-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-medium flex items-center mb-1">
+              <Wallet className="mr-2" size={18} />
+              Wallet Balance
+            </h3>
+            <p className="text-2xl font-bold text-primary">${walletBalance.toFixed(2)}</p>
+          </div>
+          <Button 
+            onClick={() => navigate('/wallet')}
+            variant="outline"
+            size="sm"
+          >
+            Manage
+          </Button>
+        </div>
+      </GlassCard>
+
+      {/* Action Buttons */}
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <Button 
+          onClick={() => navigate('/buy')}
+          className="bg-primary hover:bg-primary/80 h-14"
+          disabled={!canPurchaseToday}
+        >
+          <ShoppingCart className="mr-2" size={18} />
+          Buy Shares
+        </Button>
+        <Button 
+          onClick={() => navigate('/sell')}
+          variant="outline"
+          className="h-14"
+          disabled={summary.mature_shares <= 0}
+        >
+          <DollarSign className="mr-2" size={18} />
+          Sell Shares
+        </Button>
+      </div>
 
       {/* Purchase Eligibility Card */}
       <GlassCard className="mb-5">
@@ -51,19 +122,15 @@ const Dashboard = () => {
                   <div className="text-sm text-muted-foreground mt-1">
                     {nextPurchaseTime ? format(new Date(nextPurchaseTime), 'PPp') : 'Calculating...'}
                   </div>
+                  {timeRemaining && (
+                    <div className="text-sm text-amber-400 mt-1">
+                      {timeRemaining}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           </div>
-          {canPurchaseToday && (
-            <Button 
-              onClick={() => navigate('/buy')}
-              className="bg-primary hover:bg-primary/80"
-              size="sm"
-            >
-              Buy Shares
-            </Button>
-          )}
         </div>
       </GlassCard>
 
@@ -132,14 +199,6 @@ const Dashboard = () => {
                 ${((summary.mature_value - (summary.mature_value / 1.02))).toFixed(2)}
               </div>
             </div>
-            <Button 
-              onClick={() => navigate('/sell')}
-              variant="outline"
-              className="border-green-400 text-green-400 hover:bg-green-400/10"
-              size="sm"
-            >
-              Sell Shares
-            </Button>
           </div>
         </GlassCard>
       )}
@@ -154,6 +213,7 @@ const Dashboard = () => {
             <Button 
               onClick={() => navigate('/buy')}
               className="bg-primary hover:bg-primary/80"
+              disabled={!canPurchaseToday}
             >
               Purchase Your First Shares
             </Button>
