@@ -29,7 +29,17 @@ export const useTransactions = () => {
 
       if (error) throw error;
 
-      setTransactions(data);
+      // Validate and cast the transaction type to ensure it matches our expected type
+      const typedTransactions = data.map(transaction => {
+        // Ensure type is either "buy" or "sell"
+        if (transaction.type !== "buy" && transaction.type !== "sell") {
+          console.warn(`Invalid transaction type: ${transaction.type}, defaulting to "buy"`);
+          return { ...transaction, type: "buy" as const };
+        }
+        return transaction as Transaction;
+      });
+
+      setTransactions(typedTransactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
       toast({
