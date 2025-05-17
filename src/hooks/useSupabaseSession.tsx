@@ -1,7 +1,7 @@
 
 import { createContext, useState, useEffect, useContext } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client"; // Import the properly configured client
 
 // Types
 export type User = {
@@ -22,13 +22,6 @@ type SupabaseContextType = {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
-
-// Get Supabase URL and anon key from environment
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Create context
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined);

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "./useSupabaseSession";
+import { supabase } from "@/integrations/supabase/client"; // Import the properly configured client
 import { useToast } from "@/components/ui/use-toast";
 
 export type Transaction = {

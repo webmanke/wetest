@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "./useSupabaseSession";
+import { supabase } from "@/integrations/supabase/client"; // Import the properly configured client
 import { toast } from "sonner";
 
 export type PlatformSummary = {
