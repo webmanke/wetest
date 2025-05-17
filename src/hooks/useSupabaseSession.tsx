@@ -35,24 +35,34 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
     // Initial session check
     const checkSession = async () => {
       try {
+        console.log("Checking session...");
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error("Error checking session:", error);
+          setIsLoading(false);
           return;
         }
 
         if (data?.session) {
+          console.log("Session found:", data.session.user.id);
           setSession(data.session as Session);
           
           // Check if user is an admin
-          const { data: userData } = await supabase
+          const { data: userData, error: profileError } = await supabase
             .from("profiles")
             .select("is_admin")
             .eq("id", data.session.user.id)
             .single();
+          
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+          }
             
           setIsAdmin(userData?.is_admin || false);
+          console.log("Admin status:", userData?.is_admin);
+        } else {
+          console.log("No session found");
         }
       } catch (err) {
         console.error("Session check error:", err);
@@ -66,15 +76,20 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
     // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log("Auth state changed:", event);
         setSession(currentSession as Session | null);
         
         if (currentSession) {
           // Check if user is an admin after sign in
-          const { data: userData } = await supabase
+          const { data: userData, error: profileError } = await supabase
             .from("profiles")
             .select("is_admin")
             .eq("id", currentSession.user.id)
             .single();
+          
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+          }
             
           setIsAdmin(userData?.is_admin || false);
         } else {

@@ -13,6 +13,7 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const { session, isLoading, isAdmin } = useSupabaseSession();
 
+  // Don't redirect while still loading to prevent flash of redirect
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -21,10 +22,12 @@ const ProtectedRoute = ({
     );
   }
 
+  // Only redirect if we're definitely not authenticated
   if (!session) {
     return <Navigate to={redirectTo} replace />;
   }
 
+  // Only redirect if we definitely need admin access and user is not an admin
   if (requireAdmin && !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }

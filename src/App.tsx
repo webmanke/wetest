@@ -26,7 +26,11 @@ const App = () => {
       <SonnerToaster position="top-center" />
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<WelcomePage />} />
+          <Route path="/404" element={<NotFound />} />
+          
+          {/* App routes with layout */}
           <Route element={<AppLayout />}>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
@@ -44,7 +48,7 @@ const App = () => {
             </Route>
           </Route>
           
-          <Route path="/404" element={<NotFound />} />
+          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </BrowserRouter>
