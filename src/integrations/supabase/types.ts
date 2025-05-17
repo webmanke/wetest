@@ -9,13 +9,155 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      platform_settings: {
+        Row: {
+          key: string
+          value: string
+        }
+        Insert: {
+          key: string
+          value: string
+        }
+        Update: {
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          is_admin: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id: string
+          is_admin?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_admin?: boolean | null
+        }
+        Relationships: []
+      }
+      shares: {
+        Row: {
+          id: string
+          is_mature: boolean | null
+          is_sold: boolean | null
+          maturity_date: string
+          purchase_date: string
+          purchase_price: number
+          quantity: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_mature?: boolean | null
+          is_sold?: boolean | null
+          maturity_date: string
+          purchase_date?: string
+          purchase_price: number
+          quantity: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_mature?: boolean | null
+          is_sold?: boolean | null
+          maturity_date?: string
+          purchase_date?: string
+          purchase_price?: number
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          created_at: string
+          id: string
+          price: number
+          quantity: number
+          share_id: string | null
+          total_amount: number
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          price: number
+          quantity: number
+          share_id?: string | null
+          total_amount: number
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          price?: number
+          quantity?: number
+          share_id?: string | null
+          total_amount?: number
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_share_id_fkey"
+            columns: ["share_id"]
+            isOneToOne: false
+            referencedRelation: "shares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      admin_user_view: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string | null
+          is_admin: boolean | null
+          shares_owned: number | null
+          total_spent: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          is_admin?: boolean | null
+          shares_owned?: never
+          total_spent?: never
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          is_admin?: boolean | null
+          shares_owned?: never
+          total_spent?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      purchase_shares: {
+        Args: { quantity_to_buy: number; price_per_share: number }
+        Returns: boolean
+      }
+      sell_shares: {
+        Args: { share_id_to_sell: string; quantity_to_sell: number }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
